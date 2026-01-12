@@ -1,8 +1,4 @@
-export enum Status{
-    booked,
-    completed,
-    cancelled
-}
+
 
 export interface IUser{
     id: number,
@@ -16,6 +12,6 @@ export interface IBooking{
     car_name: string,
     days: number,
     rent_per_day: number,
-    status: Status,
+    status: string,
     created_at: Date
 }

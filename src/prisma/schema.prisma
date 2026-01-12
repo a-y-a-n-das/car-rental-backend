@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../generated/pnpx prisma generaterisma"
 }
 
 datasource db {
@@ -23,7 +23,8 @@ model User{
 
 model Booking{
   id Int @id @default(autoincrement())
-  user_id Int
+  user_id Int 
+  userId User @relation(fields: [user_id], references: [id])
   car_name String
   days Int
   rent_per_day Int
