@@ -1,12 +1,7 @@
 import { prisma } from "../../src/lib/prisma.ts";
 import { type IBooking } from "../../src/types/types.ts";
+import { type IData } from "../../src/types/types.ts";
 
-interface IData {
-  car_name?: string;
-  days?: number;
-  rent_per_day?: number;
-  status?: string;
-}
 
 export async function createBooking(
   carname: string,
@@ -26,17 +21,19 @@ export async function createBooking(
   return booking;
 }
 
-export async function getBookings(user_id: number, status: string) {
+export async function getBookings(user_id: number) {
   const bookings: IBooking[] = await prisma.booking.findMany({
     where: {
       user_id,
-      status,
+      NOT:{
+        status:"cancelled"
+      }
     },
   });
   return bookings;
 }
 
-export async function updateBooking(bookingId: number, data: IData) {
+export async function updateBooking(bookingId: number, data: IData): Promise<IBooking>{
   const updatedBooking = await prisma.booking.update({
     where: {
       id: bookingId,
@@ -56,3 +53,10 @@ export async function deleteBooking(bookingId: number){
     })
     return deletedBooking;
 }
+
+export async function getAllBookings(){
+    const allBookings = await prisma.booking.findMany();
+    return allBookings
+}
+
+getAllBookings().then(b=>console.log(b))

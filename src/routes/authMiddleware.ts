@@ -1,12 +1,6 @@
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { type Request, type Response } from "express";
-
-interface userReq extends Request {
-  user?: {
-    userId?: string;
-    username?: string;
-  };
-}
+import { type userReq } from "../types/types.ts";
 
 interface jwt_Payload extends JwtPayload {
   userId?: string;
@@ -28,7 +22,7 @@ async function auth(req: userReq, res: Response, next: any) {
   const secret: string = process.env.SECRET || "secret";
   const token: string = token_arr[1] || ""; // there has to be a element
   const decoded = jwt.verify(token, secret) as jwt_Payload;
-  if (decoded) {
+  if (decoded.userId && decoded.username) {
     req.user = {
       userId: decoded.userId,
       username: decoded.username,
@@ -40,6 +34,5 @@ async function auth(req: userReq, res: Response, next: any) {
     return;
   }
 }
-
 
 export default auth;
