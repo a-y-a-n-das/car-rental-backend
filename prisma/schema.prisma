@@ -3,7 +3,6 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,10 +12,7 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Status{
-  booked
 
-}
 
 model User{
   id Int @id @default(autoincrement()) 
@@ -27,8 +23,10 @@ model User{
 
 model Booking{
   id Int @id @default(autoincrement())
-  userId Int
-  booking_date DateTime
+  user_id Int
+  car_name String
+  days Int
+  rent_per_day Int
   status String
   created_at DateTime @default(now())
 
