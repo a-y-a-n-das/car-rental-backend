@@ -37,12 +37,12 @@
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "src/types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,6 @@
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { type Request, type Response } from "express";
-import { type userReq } from "../types/types.ts";
+import { type userReq } from "../types/types.js";
 
 interface jwt_Payload extends JwtPayload {
   userId?: string;
@@ -9,6 +9,7 @@ interface jwt_Payload extends JwtPayload {
 
 async function auth(req: userReq, res: Response, next: any) {
   const token_arr: string[] | undefined = req.headers.authorization?.split(" ");
+
   if (token_arr && token_arr[0] == "Bearer") {
     if (token_arr[1] == "") {
       res.status(401).send("Token missing after Bearer");

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { type Request, type Response } from "express";
 import jwt, { type Jwt } from "jsonwebtoken";
-import { createUser, findUser } from "../queries/user.ts";
+import { createUser, findUser } from "../queries/user.js";
 import bcrypt from "bcrypt";
 import type { IUser } from "../types/types.ts";
 
@@ -10,41 +10,54 @@ const router = Router();
 const bcrypt_sec = process.env.SECRET || "sec5t";
 
 router.post("/signup", async (req: Request, res: Response): Promise<void> => {
-  const { username, password } = req.body;
-  if (username == "" || password == "")
-    res.send("username or password can't be empty");
-  const hashedPass = bcrypt.hash(password, 12);
+    const { username, password } = req.body as { username: string; password: string; };
+    if (username == "" || password == "")
+      res.status(400).send("invalid inputs");
+    const userExists = await findUser(username);
+    if (userExists) {
+      res.status(409).json({
+        success: false,
+        error: "username already exists",
+      });
+      return;
+    }
+    const hashedPass = await bcrypt.hash(password, 12);
+    const user = await createUser(username, hashedPass);
+    if (user)
+      res.status(201).json({status:true,  data: { message: "user created successfully", userId: user.id } });
+    else {
+      res.status(409).json({
+        success: false,
+        error: "User with this username already exists",
+      });
+    }
   
-  const user = await createUser(username, password);
-  if (user)
-    res.status(201).json({ message: "user created successfully", user });
-  else {
-    res.status(500).json({
-      success: false,
-      error: "bleh",
-    });
-  }
 });
 
 
 router.post("/login", async (req: Request, res: Response): Promise<void> => {
-  const { username, password } = req.body;
+  
+  const { username, password } = req.body as { username: string; password: string; };
+  
   if (username == "" || password == ""){
     res.send("username or password can't be empty");
     return
   }
   
   const user: IUser | null = await findUser(username);
-  if (user)
+
+  if (!user){
     res.status(404).json({ message: "user not found" });
+    return;
+  } 
   
-  if(password!= user?.password){
+  if(!await bcrypt.compare(password, user?.password)){
     res.send("Invalid Credentials")
     return
   }
   const id = user?.id
 
-  const token = jwt.sign({ userId: id, username }, bcrypt_sec);
+  const token = jwt.sign({ userId: id, username }, bcrypt_sec, { expiresIn: "6h" });
   
   res.status(200).json({message: "login successful", token})
 });

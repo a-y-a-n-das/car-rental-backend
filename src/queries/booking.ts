@@ -1,6 +1,6 @@
-import { prisma } from "../../src/lib/prisma.ts";
-import { type IBooking } from "../../src/types/types.ts";
-import { type IData } from "../../src/types/types.ts";
+import { prisma } from "../../src/lib/prisma.js";
+import { type IBooking } from "../../src/types/types.js";
+import { type IData } from "../../src/types/types.js";
 
 
 export async function createBooking(
@@ -59,4 +59,3 @@ export async function getAllBookings(){
     return allBookings
 }
 
-getAllBookings().then(b=>console.log(b))

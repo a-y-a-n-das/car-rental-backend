@@ -1,16 +1,16 @@
-import { prisma } from '../../src/lib/prisma.ts'
-import type { IUser } from '../../src/types/types.ts';
+import { prisma } from '../../src/lib/prisma.js'
+import type { IUser } from '../../src/types/types.js';
 
 export async function createUser(username: string, password: string): Promise<IUser> {
-  // Create a new user with a post
   const user = await prisma.user.create({
     data: {
-      username: username,
-      password: password,
+      username,
+      password,
     },
   })
   return user;
 }
+
 export async function findUser(username: string): Promise<IUser | null> {
   // Create a new user with a post
   const user = await prisma.user.findUnique({
@@ -18,7 +18,6 @@ export async function findUser(username: string): Promise<IUser | null> {
       username: username,
     },
   })
-  console.log(user)
   return user;
 }
 

@@ -6,7 +6,7 @@ import {
   getAllBookings,
   getBookings,
   updateBooking,
-} from "../queries/booking.ts";
+} from "../queries/booking.js";
 import type { IBooking,  userReq } from "../types/types.ts";
 
 const router = Router();
@@ -14,13 +14,20 @@ const router = Router();
 router.post("/create", async (req: userReq, res: Response) => {
   const { carName, days, rentPerDay } = req.body;
   const { userId } = req.user as { userId: string; };
+  if(parseInt(days)>365 || parseInt(rentPerDay)>2000){
+    res.status(400).send("invalid inputs")
+    return;
+  }
+
   const booking = await createBooking(carName, days, rentPerDay, parseInt(userId));
 
   if (booking) {
     res.status(201).json({ success: true, data: booking });
   } else {
     res.status(400).send("invalid inputs");
+    return;
   }
+  
 }) ;
 
 router.get("/bookings", async (req: userReq, res: Response) => {
@@ -29,7 +36,7 @@ router.get("/bookings", async (req: userReq, res: Response) => {
 
   const bookings = getBookings(parseInt(userId))
 
-  if (summary) {
+  if (Boolean(summary)) {
     let totalAmountSpent = 0;
     (await bookings).forEach((b: IBooking) => {
       totalAmountSpent += b.rent_per_day * b.days;
@@ -46,21 +53,27 @@ router.get("/bookings", async (req: userReq, res: Response) => {
     });
   }
 
-  if (!summary) {
+  else if (!Boolean(summary) && bookingId) {
     let id = Number(bookingId);
     let booking = (await bookings).filter((b: IBooking) => {
       b.id == id;
     });
+    if(booking.length==0){
+      res.status(404).json({ success: false, error: "bookingId not found" });
+      return;
+    }
     res.status(200).json({ success: true, data: booking });
-  } else {
-    res.status(400).send("bookingId not found");
+  } 
+  else if(bookingId == undefined || bookingId == null){
+    res.status(404).json({ success: false, error: "bookingId not found" });
   }
 });
 
-router.put("/updatebooking/:bookingId", async (req: userReq, res: Response) => {
-  const bookingId = Number(req.params.bookingId);
+router.put("/update/:bookingId", async (req: userReq, res: Response) => {
+  const id = req.params.bookingId;
+  const bookingId = Number(id);
   const { userId } = req.user as { userId: string; };
-  const data = req.body;
+  const { data }= req.body;
   if (!data || !bookingId) {
     res.status(400).send("Invalid inputs");
     return;
